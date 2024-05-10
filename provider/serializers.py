@@ -1,9 +1,11 @@
 from rest_framework import serializers
+
 from provider.models import Contact, Product, Factory, Retail, Entrepreneur
 
 
 class ContactSerializer(serializers.ModelSerializer):
     """Сериализатор для модели контакты"""
+
     class Meta:
         model = Contact
         fields = '__all__'
@@ -11,6 +13,7 @@ class ContactSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     """Сериализатор для модели продуктов"""
+
     class Meta:
         model = Product
         fields = '__all__'
@@ -18,6 +21,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class FactorySerializer(serializers.ModelSerializer):
     """Сериализатор для модели Завод"""
+
     class Meta:
         model = Factory
         fields = '__all__'
@@ -32,8 +36,8 @@ class SupplierSerializer(serializers.ModelSerializer):
     country = serializers.CharField(source='contact.country', read_only=True)
 
     def get_supplier_detail_url(self, obj):
-        """Метод получения ID поставщика.
-        Берется объект, если модель поставщика равна модели объекта, значит ID поставщика передается в адресную строку"""
+        """Метод получения ID поставщика. Берется объект, если модель поставщика равна модели объекта, значит ID
+        поставщика передается в адресную строку"""
         supplier_model = obj.supplier_type.model
         if supplier_model == 'factory':
             return f"http://localhost:8000/admin/provider/factory/{obj.supplier_id}/change/"
@@ -50,7 +54,7 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 class RetailSerializer(SupplierSerializer):
     """Сериализатор для модели Розничной сети.
-    Родительский класс полностью соответствует требованиям. Переопределять ничего не надо."""
+    Наследуемся от SupplierSerializer, перенимаем все корректировки"""
     class Meta:
         model = Retail
         fields = '__all__'
@@ -58,7 +62,9 @@ class RetailSerializer(SupplierSerializer):
 
 class EntrepreneurSerializer(SupplierSerializer):
     """Сериализатор для модели Предпринимателя.
-    Переопределение родительского метода get_supplier_detail_url, поправка адреса"""
+    Переопределение метода get_supplier_detail_url.
+    Измененно условие elif и возвращаемая строка."""
+
     class Meta:
         model = Entrepreneur
         fields = '__all__'

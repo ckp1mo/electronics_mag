@@ -5,6 +5,7 @@ from provider.serializers import RetailSerializer, EntrepreneurSerializer
 
 
 class SupplierAdmin(admin.ModelAdmin):
+    """Общий класс для представления в административной панели"""
     list_display = (
         'name', 'contact', 'supplier_type', 'supplier_id', 'get_supplier_detail_url', 'get_retail_town',
         'debt')
@@ -17,8 +18,8 @@ class SupplierAdmin(admin.ModelAdmin):
     get_retail_town.short_description = 'Город'
 
     def get_retail_debt(self, obj):
-        # Достаем поле с долгом, при его отсутствии выставляем значение равное 0
-        return obj.debt if obj.debt else 0
+        # Достаем поле с долгом
+        return obj.debt
 
     get_retail_debt.short_description = 'Долг'
 

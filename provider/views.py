@@ -8,6 +8,10 @@ from provider.serializers import FactorySerializer, RetailSerializer, Entreprene
 
 
 class RetailListCreateAPIView(generics.ListCreateAPIView):
+    """Совмещенное представление для создания и просмотра Розничных сетей
+    GET-запрос для просмотра всех ретейлеров, POST-запрос на создание объекта.
+    Присутствует фильтрация по стране.
+    Права доступа только для авторизованных и активных пользователей."""
     serializer_class = RetailSerializer
     queryset = Retail.objects.all()
     filter_backends = [DjangoFilterBackend]
@@ -15,13 +19,18 @@ class RetailListCreateAPIView(generics.ListCreateAPIView):
     permission_classes = [IsActiveUser]
 
     def perform_create(self, serializer):
-        supplier_id = serializer.validated_data.get('supplier_id')
-        supplier_type = serializer.validated_data.get('supplier_type')
+        """Переопределенный метод создания гарантирует, что созданный объект будет иметь существующий ID поставщика"""
+        # Достаем пару полей из валидированных данных
+        supplier_id = serializer.validated_data.get('supplier_id')  # Указанный ID поставщика
+        supplier_type = serializer.validated_data.get('supplier_type')  # Указанный тип поставщика, объект ContentType
 
         if supplier_id and supplier_type:
+            # Получаем указанный тип ContentType по его ID
             content_type = ContentType.objects.get_for_id(supplier_type.id)
+            # Получаем класс модели по его имени и метке приложения
             model_class = apps.get_model(content_type.app_label, content_type.model)
             try:
+                # Попытка получить объект модели поставщика
                 model_instance = model_class.objects.get(pk=supplier_id)
             except model_class.DoesNotExist:
                 raise serializers.ValidationError({'supplier_id': 'Неверный идентификатор поставщика'})
@@ -34,7 +43,8 @@ class RetailRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsActiveUser]
 
 
-class EntrepreneurListCreateAPIView(generics.ListCreateAPIView):
+class EntrepreneurListCreateAPIView(RetailListCreateAPIView, generics.ListCreateAPIView):
+    """Наследуемся от RetailListCreateAPIView. Сохраняем переопределнный метод, фильтр и права доступа."""
     serializer_class = EntrepreneurSerializer
     queryset = Entrepreneur.objects.all()
 

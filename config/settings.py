@@ -10,7 +10,7 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-0k$3ao%_p5h1(gpmc6#bl)1&ug%c79+t)@3g##9(^u$(p15wj-"
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "provider",
     "users",
     "django_filters",
+    "drf-yasg",
 ]
 
 MIDDLEWARE = [

@@ -77,7 +77,8 @@ class FactoryListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = FactorySerializer
     queryset = Factory.objects.all()
     permission_classes = [IsActiveUser]
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ('contact__country',)
 
 class FactoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FactorySerializer

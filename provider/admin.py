@@ -7,7 +7,7 @@ from provider.serializers import RetailSerializer, EntrepreneurSerializer
 class SupplierAdmin(admin.ModelAdmin):
     """Общий класс для представления в административной панели"""
     list_display = (
-        'name', 'contact', 'supplier_type', 'supplier_id', 'debt', 'get_supplier_detail_url', 'get_retail_town',
+        'name', 'id', 'contact', 'supplier_type', 'supplier_id', 'debt', 'get_supplier_detail_url', 'get_retail_town',
         'get_retail_country')
     list_filter = ('contact__town',)
 
@@ -58,8 +58,32 @@ class EntrepreneurAdmin(SupplierAdmin, admin.ModelAdmin):
     get_supplier_detail_url.short_description = 'Ссылка на поставщика'
 
 
+class FactoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'id', 'contact', 'get_retail_country', 'get_retail_town', )
+
+    def get_retail_country(self, obj):
+        # Достаем значение Страны
+        return obj.contact.country
+
+    get_retail_country.short_description = 'Страна'
+
+    def get_retail_town(self, obj):
+        # Достаем значение город
+        return obj.contact.town
+    get_retail_town.short_description = 'Город'
+
+
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ('email', 'id', 'country', 'town', 'street', 'house_num', )
+    list_filter = ('country', 'town', )
+
+
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('product_name', 'product_model', 'date_at', )
+
+
 admin.site.register(Retail, RetailAdmin)
 admin.site.register(Entrepreneur, EntrepreneurAdmin)
-admin.site.register(Factory)
-admin.site.register(Contact)
-admin.site.register(Product)
+admin.site.register(Factory, FactoryAdmin)
+admin.site.register(Contact, ContactAdmin)
+admin.site.register(Product, ProductAdmin)

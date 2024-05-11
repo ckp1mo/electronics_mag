@@ -42,6 +42,24 @@ class RetailRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Retail.objects.all()
     permission_classes = [IsActiveUser]
 
+    def perform_update(self, serializer):
+        """Переопределенный метод создания гарантирует, что обновляемый объект будет иметь существующий ID поставщика"""
+        # Достаем пару полей из валидированных данных
+        supplier_id = serializer.validated_data.get('supplier_id')  # Указанный ID поставщика
+        supplier_type = serializer.validated_data.get('supplier_type')  # Указанный тип поставщика, объект ContentType
+
+        if supplier_id and supplier_type:
+            # Получаем указанный тип ContentType по его ID
+            content_type = ContentType.objects.get_for_id(supplier_type.id)
+            # Получаем класс модели по его имени и метке приложения
+            model_class = apps.get_model(content_type.app_label, content_type.model)
+            try:
+                # Попытка получить объект модели поставщика
+                model_instance = model_class.objects.get(pk=supplier_id)
+            except model_class.DoesNotExist:
+                raise serializers.ValidationError({'supplier_id': 'Неверный идентификатор поставщика'})
+            serializer.save()
+
 
 class EntrepreneurListCreateAPIView(RetailListCreateAPIView, generics.ListCreateAPIView):
     """Наследуемся от RetailListCreateAPIView. Сохраняем переопределнный метод, фильтр и права доступа."""
@@ -49,7 +67,7 @@ class EntrepreneurListCreateAPIView(RetailListCreateAPIView, generics.ListCreate
     queryset = Entrepreneur.objects.all()
 
 
-class EntrepreneurRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class EntrepreneurRetrieveUpdateDestroyAPIView(RetailRetrieveUpdateDestroyAPIView, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EntrepreneurSerializer
     queryset = Entrepreneur.objects.all()
     permission_classes = [IsActiveUser]

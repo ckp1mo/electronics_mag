@@ -80,6 +80,7 @@ class FactoryListCreateAPIView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ('contact__country',)
 
+
 class FactoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FactorySerializer
     queryset = Factory.objects.all()

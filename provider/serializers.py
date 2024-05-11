@@ -29,15 +29,16 @@ class FactorySerializer(serializers.ModelSerializer):
 
 class SupplierSerializer(serializers.ModelSerializer):
     """Основной сериализатор для ретейлеров
-    supplier_detail_url - добавляется поле с ссылкой поставщика
-    retail_town - поле для отображения города ретейлера"""
+    supplier_detail_url - добавляется поле со ссылкой поставщика
+    retail_town - поле для отображения города ретейлера
+    country - оле для отображения страны"""
     supplier_detail_url = serializers.SerializerMethodField()
     retail_town = serializers.CharField(source='contact.town', read_only=True)
     country = serializers.CharField(source='contact.country', read_only=True)
 
     def get_supplier_detail_url(self, obj):
         """Метод получения ID поставщика. Берется объект, если модель поставщика равна модели объекта, значит ID
-        поставщика передается в адресную строку"""
+        поставщика передается в адресную строку и возвращается значением в поле supplier_detail_url"""
         supplier_model = obj.supplier_type.model
         if supplier_model == 'factory':
             return f"http://localhost:8000/admin/provider/factory/{obj.supplier_id}/change/"
@@ -47,14 +48,15 @@ class SupplierSerializer(serializers.ModelSerializer):
             return None
 
     def update(self, instance, validated_data):
-        """Переопределяем метод обновления"""
+        """Переопределяем метод обновления.
+        Убираем возможность изменения долго через API запрос"""
         validated_data.pop('debt', None)  # Удаляем поле 'debt' из данных перед обновлением
         return super().update(instance, validated_data)
 
 
 class RetailSerializer(SupplierSerializer):
     """Сериализатор для модели Розничной сети.
-    Наследуемся от SupplierSerializer, перенимаем все корректировки"""
+    Наследуемся от SupplierSerializer, перенимаем все изменения"""
     class Meta:
         model = Retail
         fields = '__all__'

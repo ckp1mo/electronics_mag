@@ -7,9 +7,15 @@ from provider.serializers import RetailSerializer, EntrepreneurSerializer
 class SupplierAdmin(admin.ModelAdmin):
     """Общий класс для представления в административной панели"""
     list_display = (
-        'name', 'contact', 'supplier_type', 'supplier_id', 'get_supplier_detail_url', 'get_retail_town',
-        'debt')
+        'name', 'contact', 'supplier_type', 'supplier_id', 'debt', 'get_supplier_detail_url', 'get_retail_town',
+        'get_retail_country')
     list_filter = ('contact__town',)
+
+    def get_retail_country(self, obj):
+        # Достаем значение Страны
+        return obj.contact.country
+
+    get_retail_country.short_description = 'Страна'
 
     def get_retail_town(self, obj):
         # Достаем значение город
